@@ -5,7 +5,9 @@ import { MOCK_RUNNERS } from "../data/mockRunners";
 
 const RESULTS_API_URL =
   (import.meta.env.VITE_RESULTS_API_URL as string | undefined)?.trim() ||
-  "https://delegate-bagginess-massive.ngrok-free.dev/api/runners";
+  (import.meta.env.DEV
+    ? "/api/runners"
+    : "https://delegate-bagginess-massive.ngrok-free.dev/api/runners");
 const RESULTS_API_KEY = (
   import.meta.env.VITE_RESULTS_API_KEY as string | undefined
 )?.trim();
