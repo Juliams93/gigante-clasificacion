@@ -2,13 +2,15 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/supabase';
 
 // ─── Configuración Supabase ───────────────────────────────
-// Crea tu proyecto gratuito en https://supabase.com
-// Luego copia las credenciales en el archivo .env
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string) || null;
+const supabaseKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || null;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn('[Supabase] Faltan VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en .env');
+  console.warn('[Supabase] Faltan VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en .env — modo sin Supabase activo');
 }
 
-export const supabase = createClient<Database>(supabaseUrl ?? '', supabaseKey ?? '');
+// Usa una URL placeholder si no hay credenciales para evitar crash en modo demo
+export const supabase = createClient<Database>(
+  supabaseUrl ?? 'https://placeholder.supabase.co',
+  supabaseKey ?? 'placeholder-key',
+);
