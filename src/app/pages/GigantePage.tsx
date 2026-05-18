@@ -10,7 +10,6 @@ import {
   Mountain,
   Filter,
 } from "lucide-react";
-import { useSearchParams } from "react-router";
 import { useRaceResults } from "../hooks/useRaceResults";
 import type { Runner } from "../../types/supabase";
 
@@ -59,8 +58,8 @@ function CategoryPositionBadge({ pos }: { pos: number | null }) {
 }
 
 export default function GigantePage() {
-  const [searchParams] = useSearchParams();
   const hasBackendApi = Boolean(import.meta.env.VITE_RESULTS_API_URL);
+  const searchParams = new URLSearchParams(window.location.search);
   const isDemoMode = hasBackendApi
     ? searchParams.get("demo") === "1"
     : searchParams.get("demo") !== "0";
