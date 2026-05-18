@@ -147,7 +147,7 @@ async function fetchRunnersFromApi(
   apiUrl: string,
   params: URLSearchParams,
 ): Promise<Runner[]> {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = { "ngrok-skip-browser-warning": "1" };
   if (RESULTS_API_KEY) headers["x-api-key"] = RESULTS_API_KEY;
 
   const response = await fetch(`${apiUrl}?${params.toString()}`, { headers });
