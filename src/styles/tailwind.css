@@ -1,0 +1,15 @@
+@import 'tailwindcss' source(none);
+@source '../**/*.{js,ts,jsx,tsx}';
+
+@import 'tw-animate-css';
+
+/* ─── Colores de marca ────────────────────────────────────
+   Para cambiar el color principal de la web, edita solo
+   estos valores. Se usarán en toda la aplicación como:
+   bg-brand, text-brand, border-brand, etc.
+   ────────────────────────────────────────────────────── */
+@theme {
+  --color-brand:      #DA6F65;
+  --color-brand-dark: #c96059;
+  --color-brand-light: #e8928a;
+}
