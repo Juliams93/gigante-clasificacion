@@ -59,7 +59,7 @@ function CategoryPositionBadge({ pos }: { pos: number | null }) {
 
 export default function GigantePage() {
   const hasBackendApi = Boolean(import.meta.env.VITE_RESULTS_API_URL);
-  const isProduction = 
+  const isProduction =
     typeof globalThis !== "undefined" &&
     globalThis.window !== undefined &&
     globalThis.window.location.hostname !== "localhost" &&
@@ -68,8 +68,9 @@ export default function GigantePage() {
   // In production without backend API, always use demo mode
   // Otherwise, allow demo mode to be controlled via URL parameter
   const searchParams = new URLSearchParams(window.location.search);
-  const isDemoMode = (isProduction && !hasBackendApi) || searchParams.get("demo") === "1";
-  
+  const isDemoMode =
+    (isProduction && !hasBackendApi) || searchParams.get("demo") === "1";
+
   const [dorsal, setDorsal] = useState("");
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("TODAS");

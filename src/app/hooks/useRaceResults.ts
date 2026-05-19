@@ -3,49 +3,41 @@ import { supabase } from "../../lib/supabase";
 import type { Runner } from "../../types/supabase";
 import { MOCK_RUNNERS } from "../data/mockRunners";
 
-// Backend API URL - use environment variable or Render deployment
-// In production on Vercel, set VITE_RESULTS_API_URL environment variable
+// Backend API URL configuration
 const CONFIGURED_RESULTS_API_URL = (
   import.meta.env.VITE_RESULTS_API_URL as string | undefined
 )?.trim();
+
+function getResultsApiUrl(): string {
+  // Check if we're in a browser environment
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  // If explicitly configured, use it
+  if (CONFIGURED_RESULTS_API_URL) {
+    return CONFIGURED_RESULTS_API_URL;
+  }
+
+  // Check if we're on localhost
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+  if (isLocalhost) {
+    // In development, use local API proxy
+    return "/api/runners";
+  }
+
+  // In production without explicit config, return empty to trigger demo mode
+  return "";
+}
 
 function isLocalBackendUrl(url: string): boolean {
   return /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?\//i.test(url);
 }
 
-function resolveResultsApiUrl(): string {
-  if (!CONFIGURED_RESULTS_API_URL) {
-    // In production, only use API if explicitly configured
-    // Otherwise fall back to local demo mode to avoid CORS issues
-    const isProduction =
-      typeof globalThis !== "undefined" &&
-      globalThis.window !== undefined &&
-      globalThis.window.location.hostname !== "localhost" &&
-      globalThis.window.location.hostname !== "127.0.0.1";
-
-    // Return empty string to trigger demo mode in production
-    // User must deploy backend to Render and set VITE_RESULTS_API_URL env var
-    if (isProduction) {
-      return "";
-    }
-    return "/api/runners";
-  }
-
-  // In production, ignore accidental localhost configuration
-  if (
-    typeof globalThis !== "undefined" &&
-    globalThis.window !== undefined &&
-    globalThis.window.location.hostname !== "localhost" &&
-    globalThis.window.location.hostname !== "127.0.0.1" &&
-    isLocalBackendUrl(CONFIGURED_RESULTS_API_URL)
-  ) {
-    return "";
-  }
-
-  return CONFIGURED_RESULTS_API_URL;
-}
-
-const RESULTS_API_URL = resolveResultsApiUrl();
+const RESULTS_API_URL = getResultsApiUrl();
 const RESULTS_API_KEY = (
   import.meta.env.VITE_RESULTS_API_KEY as string | undefined
 )?.trim();
@@ -212,23 +204,18 @@ export function useRaceResults({
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [totalFinishers, setTotalFinishers] = useState(0);
-  
-  // Check if we're in production without API URL configured
-  const isProduction = 
-    typeof globalThis !== "undefined" &&
-    globalThis.window !== undefined &&
-    globalThis.window.location.hostname !== "localhost" &&
-    globalThis.window.location.hostname !== "127.0.0.1";
-  
-  // Force demo mode in production if no API is configured
-  const effectiveDemoMode = demoMode || (isProduction && !RESULTS_API_URL);
-  const usingApi = Boolean(RESULTS_API_URL);
+
+  // Determine if we should use API or demo mode
+  // Get API URL at render time (not at module load time)
+  const apiUrl = getResultsApiUrl();
+  const shouldUseDemoMode = demoMode || !apiUrl;
+  const usingApi = Boolean(apiUrl);
 
   // Carga inicial
   useEffect(() => {
     let active = true;
 
-    if (effectiveDemoMode) {
+    if (shouldUseDemoMode) {
       const demoRunners = filterLocalRunners(MOCK_RUNNERS, {
         categoria,
         modalidad,
@@ -264,7 +251,7 @@ export function useRaceResults({
             search,
             sortBy,
           });
-          const apiRunners = await fetchRunnersFromApi(RESULTS_API_URL, params);
+          const apiRunners = await fetchRunnersFromApi(apiUrl, params);
           if (!active) return;
 
           setRunners(apiRunners);
