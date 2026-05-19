@@ -74,6 +74,7 @@ export default function GigantePage() {
   const [dorsal, setDorsal] = useState("");
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("TODAS");
+  const [openRunnerId, setOpenRunnerId] = useState<number | null>(null);
 
   const { runners, loading, error, lastUpdate, totalFinishers, isLive } =
     useRaceResults({
@@ -274,6 +275,10 @@ export default function GigantePage() {
                   key={runner.id}
                   runner={runner}
                   generalPosition={index + 1}
+                  isOpen={openRunnerId === runner.id}
+                  onToggle={() =>
+                    setOpenRunnerId((prev) => (prev === runner.id ? null : runner.id))
+                  }
                 />
               ))}
             </div>
@@ -293,9 +298,13 @@ export default function GigantePage() {
 function RunnerRow({
   runner,
   generalPosition,
+  isOpen,
+  onToggle,
 }: {
   runner: Runner;
   generalPosition: number;
+  isOpen: boolean;
+  onToggle: () => void;
 }) {
   const badge = ESTADO_BADGE[runner.estado];
   const isTop3 = generalPosition <= 3 && runner.estado === "FINALIZADO";
@@ -333,11 +342,21 @@ function RunnerRow({
           </div>
         </div>
 
-        <details className="mt-2 rounded-lg border border-gray-700/60 bg-gray-900/40">
-          <summary className="cursor-pointer list-none px-2.5 py-2 text-xs text-amber-300 font-semibold">
-            Ver detalles del corredor
-          </summary>
-          <div className="border-t border-gray-700/60 px-2.5 py-2 space-y-2 text-xs">
+        <div className="mt-2 rounded-lg border border-gray-700/60 bg-gray-900/40">
+          <button
+            type="button"
+            onClick={onToggle}
+            className="w-full flex items-center justify-between px-2.5 py-2 text-xs text-amber-300 font-semibold"
+          >
+            <span>Detalles</span>
+            <span
+              className={`transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`}
+            >
+              ▼
+            </span>
+          </button>
+          {isOpen && (
+            <div className="border-t border-gray-700/60 px-2.5 py-2 space-y-2 text-xs">
             {runner.club && (
               <div className="text-gray-400">
                 Club: <span className="text-gray-200">{runner.club}</span>
@@ -363,7 +382,8 @@ function RunnerRow({
               })}
             </div>
           </div>
-        </details>
+          )}
+        </div>
       </div>
 
       {/* Desktop */}
