@@ -9,8 +9,20 @@ services:
     healthCheckPath: /health
     envVars:
       - key: RESULTS_SOURCE
-        value: csv-url
-      - key: CSV_URL
+        value: mysql
+      - key: MYSQL_HOST
+        value: www.fenixflight.es
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: MYSQL_USER
         sync: false
+      - key: MYSQL_PASS
+        sync: false
+      - key: MYSQL_DB
+        value: fenixfli_resultados
+      - key: MYSQL_TABLES
+        value: cicloturista,cicloturistag,especial,parejas,parejasG
+      - key: API_PORT
+        value: "10000"
       - key: API_KEY
         sync: false
