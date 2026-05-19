@@ -1,48 +1,70 @@
-# Despliegue simple: Render + Vercel
+# Día de carrera: Web en Vercel + Backend local
 
-## Qué hace cada parte
+## Arquitectura para el día de la carrera
 
-- **Vercel** sirve la web.
-- **Render** sirve la API de resultados.
-- La web llama a Render con `VITE_RESULTS_API_URL`.
+- **Vercel**: Sirve la web pública
+- **Tu PC**: Corre la API local con los datos de MySQL
+- **ngrok**: Expone tu PC a Internet con URL fija
 
-## Opción más simple
+## Antes del día de la carrera
 
-Usa el backend en modo `csv-url`.
+### 1) Verificar ngrok está instalado
 
-### 1) Sube la API a Render
+```bash
+which ngrok
+```
 
-- Crea un nuevo **Web Service** usando este repo.
-- Render leerá `render.yaml`.
-- La app de API está en `sync-script`.
+Si no aparece, instala con:
 
-### 2) Variables de entorno en Render
+```bash
+brew install ngrok/ngrok/ngrok
+```
 
-Configura estas variables:
+### 2) Crear cuenta en ngrok
 
-- `RESULTS_SOURCE=csv-url`
-- `CSV_URL=https://.../resultados.csv`
-- `API_KEY=una_clave_larga_y_privada`
+- Ve a https://dashboard.ngrok.com
+- Crea cuenta gratuita
+- Copia tu auth token
 
-Si usas una URL pública de GitHub, el CSV debe ser accesible por `raw.githubusercontent.com`.
+### 3) Configurar ngrok localmente
 
-### 3) Copia la URL pública de Render
+```bash
+ngrok config add-authtoken tu_token_aqui
+```
 
-Render te dará una URL parecida a:
+Este token habilita URLs fijas.
 
-- `https://gigante-results-api.onrender.com`
+## El día de la carrera
 
-### 4) Configura Vercel
+### Paso 1: Arranca la API local
 
-En Vercel añade:
+```bash
+cd /Users/julia/Downloads/webff/sync-script
+npm run api
+```
 
-- `VITE_RESULTS_API_URL=https://gigante-results-api.onrender.com/api/runners`
-- `VITE_RESULTS_API_KEY=la_misma_clave_que_en_Render`
+Verás: `API server running on port 8787`
 
-### 5) Despliega de nuevo en Vercel
+### Paso 2: Arranca ngrok (en otra terminal)
 
-Después del cambio, la web quedará apuntando a la API pública y ya no dependerá de tu ordenador.
+```bash
+ngrok http --url=delegate-bagginess-massive.ngrok-free.dev 8787
+```
 
-## Si quieres datos en tiempo real
+Verás: `forwarding to http://localhost:8787`
 
-Entonces necesitas otra fuente que alimente el CSV o una base de datos en la nube. Para empezar, `csv-url` es la vía más simple.
+### Paso 3: Abre la web en Vercel
+
+La URL pública es: **https://vercel-url-aqui** (la que configuraste en Vercel)
+
+La web automáticamente llama a `https://delegate-bagginess-massive.ngrok-free.dev/api/runners`
+
+## Si no funciona
+
+1. Comprueba que MySQL está corriendo
+2. Verifica que `RESULTS_SOURCE=mysql` en `sync-script/.env`
+3. Si ngrok falla, genera una URL nueva en https://dashboard.ngrok.com y actualiza Vercel
+
+## Automatizar todo (opcional)
+
+Crea un script que corra ambos comandos a la vez (próximamente).

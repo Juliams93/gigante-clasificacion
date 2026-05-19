@@ -1,4 +1,6 @@
-const DEFAULT_BACKEND_URL = process.env.RESULTS_API_URL?.trim() || "";
+const DEFAULT_BACKEND_URL =
+  process.env.RESULTS_API_URL?.trim() ||
+  "https://delegate-bagginess-massive.ngrok-free.dev/api/runners";
 
 module.exports = async function runnersProxy(req, res) {
   if (req.method && req.method !== "GET") {
@@ -9,18 +11,6 @@ module.exports = async function runnersProxy(req, res) {
   }
 
   try {
-    if (!DEFAULT_BACKEND_URL) {
-      res.statusCode = 500;
-      res.setHeader("Content-Type", "application/json; charset=utf-8");
-      res.end(
-        JSON.stringify({
-          error:
-            "RESULTS_API_URL no configurado en Vercel. Debe apuntar a un backend público.",
-        }),
-      );
-      return;
-    }
-
     const incomingUrl = new URL(req.url, "http://localhost");
     const targetUrl = new URL(DEFAULT_BACKEND_URL);
     targetUrl.search = incomingUrl.search;
