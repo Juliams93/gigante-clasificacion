@@ -104,16 +104,16 @@ export default function GigantePage() {
         <div className="max-w-7xl mx-auto px-4 py-5 md:py-8">
           <div className="flex flex-col md:flex-row md:items-end gap-4 justify-between">
             <div>
-              <div className="flex items-center gap-2 md:gap-6 mb-3 md:mb-4 min-w-0">
+              <div className="flex items-center justify-center md:justify-start gap-0 md:gap-6 mb-3 md:mb-4 min-w-0">
                 <img
                   src="/imagenes/logo-gigante-negro.png"
                   alt="La Gigante de Piedra"
-                  className="h-12 w-12 md:h-28 md:w-auto object-contain flex-shrink-0"
+                  className="hidden md:block h-28 w-auto object-contain flex-shrink-0"
                 />
                 <img
                   src="/imagenes/LETRAS_LOGO GIGANTE_Grises.png"
                   alt="Gigante"
-                  className="hidden md:block h-40 w-auto object-contain object-left"
+                  className="h-16 sm:h-20 md:h-40 w-auto object-contain object-center max-w-[92vw] md:max-w-none"
                 />
               </div>
               <span className="text-amber-400 font-bold text-xs md:text-sm tracking-widest uppercase block">
@@ -322,8 +322,8 @@ function RunnerRow({
       {/* Movil */}
       <div className="md:hidden px-3 py-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 text-center flex-shrink-0 text-sm font-bold text-gray-300">
-            {generalPosition}
+          <div className="w-7 text-center flex-shrink-0">
+            <PodiumIcon pos={generalPosition} />
           </div>
           <span className="text-xs font-mono font-bold text-gray-300 bg-gray-700/60 px-1.5 py-0.5 rounded flex-shrink-0">
             {runner.dorsal}
