@@ -9,29 +9,29 @@ const CONFIGURED_RESULTS_API_URL = (
   import.meta.env.VITE_RESULTS_API_URL as string | undefined
 )?.trim();
 
-// Fallback Render API URL (will be updated after deployment)
-const DEFAULT_PRODUCTION_API = "https://gigante-results-api.onrender.com/api/runners";
-
 function isLocalBackendUrl(url: string): boolean {
   return /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?\//i.test(url);
 }
 
 function resolveResultsApiUrl(): string {
   if (!CONFIGURED_RESULTS_API_URL) {
-    // In production, use Render API for live backend data
+    // In production, only use API if explicitly configured
+    // Otherwise fall back to local demo mode to avoid CORS issues
     const isProduction =
       typeof globalThis !== "undefined" &&
       globalThis.window !== undefined &&
       globalThis.window.location.hostname !== "localhost" &&
       globalThis.window.location.hostname !== "127.0.0.1";
 
+    // Return empty string to trigger demo mode in production
+    // User must deploy backend to Render and set VITE_RESULTS_API_URL env var
     if (isProduction) {
-      return DEFAULT_PRODUCTION_API;
+      return "";
     }
     return "/api/runners";
   }
 
-  // In production, ignore accidental localhost configuration and use production API instead
+  // In production, ignore accidental localhost configuration
   if (
     typeof globalThis !== "undefined" &&
     globalThis.window !== undefined &&
@@ -39,7 +39,7 @@ function resolveResultsApiUrl(): string {
     globalThis.window.location.hostname !== "127.0.0.1" &&
     isLocalBackendUrl(CONFIGURED_RESULTS_API_URL)
   ) {
-    return DEFAULT_PRODUCTION_API;
+    return "";
   }
 
   return CONFIGURED_RESULTS_API_URL;
@@ -212,13 +212,23 @@ export function useRaceResults({
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [totalFinishers, setTotalFinishers] = useState(0);
+  
+  // Check if we're in production without API URL configured
+  const isProduction = 
+    typeof globalThis !== "undefined" &&
+    globalThis.window !== undefined &&
+    globalThis.window.location.hostname !== "localhost" &&
+    globalThis.window.location.hostname !== "127.0.0.1";
+  
+  // Force demo mode in production if no API is configured
+  const effectiveDemoMode = demoMode || (isProduction && !RESULTS_API_URL);
   const usingApi = Boolean(RESULTS_API_URL);
 
   // Carga inicial
   useEffect(() => {
     let active = true;
 
-    if (demoMode) {
+    if (effectiveDemoMode) {
       const demoRunners = filterLocalRunners(MOCK_RUNNERS, {
         categoria,
         modalidad,
