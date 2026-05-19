@@ -3,9 +3,14 @@ import { supabase } from "../../lib/supabase";
 import type { Runner } from "../../types/supabase";
 import { MOCK_RUNNERS } from "../data/mockRunners";
 
+// Backend API URL - use environment variable or Render deployment
+// In production on Vercel, set VITE_RESULTS_API_URL environment variable
 const CONFIGURED_RESULTS_API_URL = (
   import.meta.env.VITE_RESULTS_API_URL as string | undefined
 )?.trim();
+
+// Fallback Render API URL (will be updated after deployment)
+const DEFAULT_PRODUCTION_API = "https://gigante-results-api.onrender.com/api/runners";
 
 function isLocalBackendUrl(url: string): boolean {
   return /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?\//i.test(url);
@@ -13,7 +18,7 @@ function isLocalBackendUrl(url: string): boolean {
 
 function resolveResultsApiUrl(): string {
   if (!CONFIGURED_RESULTS_API_URL) {
-    // In production, default to ngrok URL for live backend data
+    // In production, use Render API for live backend data
     const isProduction =
       typeof globalThis !== "undefined" &&
       globalThis.window !== undefined &&
@@ -21,12 +26,12 @@ function resolveResultsApiUrl(): string {
       globalThis.window.location.hostname !== "127.0.0.1";
 
     if (isProduction) {
-      return "https://delegate-bagginess-massive.ngrok-free.dev/api/runners";
+      return DEFAULT_PRODUCTION_API;
     }
     return "/api/runners";
   }
 
-  // In production, ignore accidental localhost configuration and use ngrok instead.
+  // In production, ignore accidental localhost configuration and use production API instead
   if (
     typeof globalThis !== "undefined" &&
     globalThis.window !== undefined &&
@@ -34,7 +39,7 @@ function resolveResultsApiUrl(): string {
     globalThis.window.location.hostname !== "127.0.0.1" &&
     isLocalBackendUrl(CONFIGURED_RESULTS_API_URL)
   ) {
-    return "https://delegate-bagginess-massive.ngrok-free.dev/api/runners";
+    return DEFAULT_PRODUCTION_API;
   }
 
   return CONFIGURED_RESULTS_API_URL;
