@@ -100,22 +100,26 @@ export default function GigantePage() {
     <div className="min-h-screen bg-gray-950 text-white">
       {/* ── Cabecera ────────────────────────────────────────── */}
       <header className="bg-gradient-to-br from-gray-900 via-stone-900 to-gray-900 border-b border-stone-700/50 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-5 md:py-8">
           <div className="flex flex-col md:flex-row md:items-end gap-4 justify-between">
             <div>
-              <div className="flex items-center gap-6 mb-4">
+              <div className="flex items-center gap-3 md:gap-6 mb-3 md:mb-4">
                 <img
                   src="/imagenes/logo-gigante-negro.png"
                   alt="La Gigante de Piedra"
-                  className="h-24 md:h-28 w-auto object-contain"
+                  className="h-16 md:h-28 w-auto object-contain flex-shrink-0"
                 />
                 <img
                   src="/imagenes/LETRAS_LOGO GIGANTE_Grises.png"
                   alt="Gigante"
-                  className="h-32 md:h-40 w-auto object-contain"
+                  className="hidden sm:block h-24 md:h-40 w-auto object-contain"
                 />
+                <div className="sm:hidden">
+                  <div className="text-white font-black text-xl leading-tight">La Gigante</div>
+                  <div className="text-white font-black text-xl leading-tight">de Piedra</div>
+                </div>
               </div>
-              <span className="text-amber-400 font-bold text-sm tracking-widest uppercase block">
+              <span className="text-amber-400 font-bold text-xs md:text-sm tracking-widest uppercase block">
                 Clasificación Oficial
               </span>
             </div>
@@ -302,7 +306,7 @@ function RunnerRow({
 
   return (
     <div
-      className={`grid grid-cols-[56px_60px_1fr_auto] md:grid-cols-[56px_110px_60px_1fr_120px_130px_280px_100px] gap-3 items-center px-4 py-3.5 rounded-xl border transition-all duration-300 ${
+      className={`grid grid-cols-[44px_52px_1fr_auto] md:grid-cols-[56px_110px_60px_1fr_120px_130px_280px_100px] gap-2 md:gap-3 items-center px-3 md:px-4 py-3 md:py-3.5 rounded-xl border transition-all duration-300 ${
         isTop3
           ? "bg-amber-500/10 border-amber-500/30"
           : runner.estado === "EN_CARRERA"
@@ -328,12 +332,12 @@ function RunnerRow({
       </div>
 
       {/* Nombre */}
-      <div>
-        <div className="font-semibold text-white text-sm leading-tight">
+      <div className="min-w-0">
+        <div className="font-semibold text-white text-xs md:text-sm leading-tight truncate">
           {runner.nombre} {runner.apellidos}
         </div>
         {runner.club && (
-          <div className="text-xs text-gray-500 mt-0.5 truncate max-w-[200px]">
+          <div className="text-xs text-gray-500 mt-0.5 truncate">
             {runner.club}
           </div>
         )}
