@@ -32,10 +32,7 @@ export default async function runnersProxy(req, res) {
       headers["x-api-key"] = process.env.RESULTS_API_KEY;
     }
 
-    const response = await fetch(targetUrl.toString(), {
-      headers,
-      signal: AbortSignal.timeout(15_000),
-    });
+    const response = await fetch(targetUrl.toString(), { headers });
     const body = await response.text();
 
     res.statusCode = response.status;
@@ -54,4 +51,4 @@ export default async function runnersProxy(req, res) {
       }),
     );
   }
-};
+}
