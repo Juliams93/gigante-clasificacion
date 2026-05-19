@@ -3,9 +3,33 @@ import { supabase } from "../../lib/supabase";
 import type { Runner } from "../../types/supabase";
 import { MOCK_RUNNERS } from "../data/mockRunners";
 
-const RESULTS_API_URL =
-  (import.meta.env.VITE_RESULTS_API_URL as string | undefined)?.trim() ||
-  "/api/runners";
+const CONFIGURED_RESULTS_API_URL = (
+  import.meta.env.VITE_RESULTS_API_URL as string | undefined
+)?.trim();
+
+function isLocalBackendUrl(url: string): boolean {
+  return /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?\//i.test(
+    url,
+  );
+}
+
+function resolveResultsApiUrl(): string {
+  if (!CONFIGURED_RESULTS_API_URL) return "/api/runners";
+
+  // In production, ignore accidental localhost configuration and use Vercel API.
+  if (
+    globalThis.window !== undefined &&
+    globalThis.window.location.hostname !== "localhost" &&
+    globalThis.window.location.hostname !== "127.0.0.1" &&
+    isLocalBackendUrl(CONFIGURED_RESULTS_API_URL)
+  ) {
+    return "/api/runners";
+  }
+
+  return CONFIGURED_RESULTS_API_URL;
+}
+
+const RESULTS_API_URL = resolveResultsApiUrl();
 const RESULTS_API_KEY = (
   import.meta.env.VITE_RESULTS_API_KEY as string | undefined
 )?.trim();

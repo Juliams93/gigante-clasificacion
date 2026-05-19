@@ -1,8 +1,6 @@
-const DEFAULT_BACKEND_URL =
-  process.env.RESULTS_API_URL?.trim() ||
-  "https://delegate-bagginess-massive.ngrok-free.dev/api/runners";
+const DEFAULT_BACKEND_URL = process.env.RESULTS_API_URL?.trim();
 
-module.exports = async function runnersProxy(req, res) {
+export default async function runnersProxy(req, res) {
   if (req.method && req.method !== "GET") {
     res.statusCode = 405;
     res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -11,6 +9,17 @@ module.exports = async function runnersProxy(req, res) {
   }
 
   try {
+    if (!DEFAULT_BACKEND_URL) {
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(
+        JSON.stringify({
+          error: "Missing RESULTS_API_URL in Vercel environment variables",
+        }),
+      );
+      return;
+    }
+
     const incomingUrl = new URL(req.url, "http://localhost");
     const targetUrl = new URL(DEFAULT_BACKEND_URL);
     targetUrl.search = incomingUrl.search;
@@ -23,7 +32,10 @@ module.exports = async function runnersProxy(req, res) {
       headers["x-api-key"] = process.env.RESULTS_API_KEY;
     }
 
-    const response = await fetch(targetUrl.toString(), { headers });
+    const response = await fetch(targetUrl.toString(), {
+      headers,
+      signal: AbortSignal.timeout(15_000),
+    });
     const body = await response.text();
 
     res.statusCode = response.status;
