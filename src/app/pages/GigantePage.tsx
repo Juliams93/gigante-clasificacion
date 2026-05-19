@@ -106,9 +106,9 @@ export default function GigantePage() {
             <div>
               <div className="flex items-center justify-center md:justify-start gap-0 md:gap-6 mb-3 md:mb-4 min-w-0">
                 <img
-                  src="/imagenes/logo-gigante-negro.png"
+                  src="/imagenes/logo-gigante-color.png"
                   alt="La Gigante de Piedra"
-                  className="hidden md:block h-28 w-auto object-contain flex-shrink-0"
+                  className="h-12 sm:h-16 md:h-28 w-auto object-contain flex-shrink-0"
                 />
                 <img
                   src="/imagenes/LETRAS_LOGO GIGANTE_Grises.png"
@@ -277,7 +277,9 @@ export default function GigantePage() {
                   generalPosition={index + 1}
                   isOpen={openRunnerId === runner.id}
                   onToggle={() =>
-                    setOpenRunnerId((prev) => (prev === runner.id ? null : runner.id))
+                    setOpenRunnerId((prev) =>
+                      prev === runner.id ? null : runner.id,
+                    )
                   }
                 />
               ))}
@@ -357,31 +359,37 @@ function RunnerRow({
           </button>
           {isOpen && (
             <div className="border-t border-gray-700/60 px-2.5 py-2 space-y-2 text-xs">
-            {runner.club && (
+              {runner.club && (
+                <div className="text-gray-400">
+                  Club: <span className="text-gray-200">{runner.club}</span>
+                </div>
+              )}
               <div className="text-gray-400">
-                Club: <span className="text-gray-200">{runner.club}</span>
+                Categoria:{" "}
+                <span className="text-gray-200">
+                  {CATEGORIA_LABEL[runner.categoria] ?? runner.categoria}
+                </span>
               </div>
-            )}
-            <div className="text-gray-400">
-              Categoria: <span className="text-gray-200">{CATEGORIA_LABEL[runner.categoria] ?? runner.categoria}</span>
+              <div className="text-gray-400">
+                Tiempo:{" "}
+                <span className="font-mono text-amber-300">
+                  {runner.tiempo_neto ?? "--:--:--"}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+                {CONTROL_KEYS.map((controlKey, index) => {
+                  const value = runner[controlKey];
+                  return (
+                    <span
+                      key={`m-${runner.id}-${controlKey}`}
+                      className={`rounded px-1.5 py-0.5 bg-gray-800/80 border border-gray-700/50 ${value ? "text-amber-300" : "text-gray-600"}`}
+                    >
+                      C{index + 1}: {value ?? "--:--:--"}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-            <div className="text-gray-400">
-              Tiempo: <span className="font-mono text-amber-300">{runner.tiempo_neto ?? "--:--:--"}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-              {CONTROL_KEYS.map((controlKey, index) => {
-                const value = runner[controlKey];
-                return (
-                  <span
-                    key={`m-${runner.id}-${controlKey}`}
-                    className={`rounded px-1.5 py-0.5 bg-gray-800/80 border border-gray-700/50 ${value ? "text-amber-300" : "text-gray-600"}`}
-                  >
-                    C{index + 1}: {value ?? "--:--:--"}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
           )}
         </div>
       </div>
@@ -453,4 +461,3 @@ function RunnerRow({
     </div>
   );
 }
-
