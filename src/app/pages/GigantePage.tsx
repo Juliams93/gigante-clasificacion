@@ -103,21 +103,17 @@ export default function GigantePage() {
         <div className="max-w-7xl mx-auto px-4 py-5 md:py-8">
           <div className="flex flex-col md:flex-row md:items-end gap-4 justify-between">
             <div>
-              <div className="flex items-center gap-3 md:gap-6 mb-3 md:mb-4">
+              <div className="flex items-center gap-3 md:gap-6 mb-3 md:mb-4 min-w-0">
                 <img
                   src="/imagenes/logo-gigante-negro.png"
                   alt="La Gigante de Piedra"
-                  className="h-16 md:h-28 w-auto object-contain flex-shrink-0"
+                  className="h-14 md:h-28 w-auto object-contain flex-shrink-0"
                 />
                 <img
                   src="/imagenes/LETRAS_LOGO GIGANTE_Grises.png"
                   alt="Gigante"
-                  className="hidden sm:block h-24 md:h-40 w-auto object-contain"
+                  className="h-16 md:h-40 w-auto object-contain min-w-0 max-w-[calc(100vw-120px)] md:max-w-none"
                 />
-                <div className="sm:hidden">
-                  <div className="text-white font-black text-xl leading-tight">La Gigante</div>
-                  <div className="text-white font-black text-xl leading-tight">de Piedra</div>
-                </div>
               </div>
               <span className="text-amber-400 font-bold text-xs md:text-sm tracking-widest uppercase block">
                 Clasificación Oficial
@@ -308,109 +304,79 @@ function RunnerRow({
     <div
       className={`grid grid-cols-[44px_52px_1fr_auto] md:grid-cols-[56px_110px_60px_1fr_120px_130px_280px_100px] gap-2 md:gap-3 items-center px-3 md:px-4 py-3 md:py-3.5 rounded-xl border transition-all duration-300 ${
         isTop3
-          ? "bg-amber-500/10 border-amber-500/30"
-          : runner.estado === "EN_CARRERA"
-            ? "bg-blue-500/5 border-blue-500/20"
-            : "bg-gray-800/50 border-gray-700/30 hover:bg-gray-800/80"
-      }`}
-    >
-      {/* Posición */}
-      <div className="flex justify-center">
-        <PodiumIcon pos={generalPosition} />
-      </div>
-
-      {/* Posición categoría */}
-      <div className="hidden md:flex items-center gap-1 justify-start">
-        <CategoryPositionBadge pos={runner.puesto_categoria} />
-      </div>
-
-      {/* Dorsal */}
-      <div className="text-center">
-        <span className="text-sm font-mono font-bold text-gray-300 bg-gray-700/60 px-2 py-0.5 rounded">
-          {runner.dorsal}
-        </span>
-      </div>
-
-      {/* Nombre */}
-      <div className="min-w-0">
-        <div className="font-semibold text-white text-xs md:text-sm leading-tight truncate">
-          {runner.nombre} {runner.apellidos}
-        </div>
-        {runner.club && (
-          <div className="text-xs text-gray-500 mt-0.5 truncate">
-            {runner.club}
-          </div>
-        )}
-      </div>
-
-      {/* Categoría */}
-      <div className="hidden md:block">
-        <span className="text-xs text-gray-400 bg-gray-700/40 px-2 py-0.5 rounded font-medium">
-          {CATEGORIA_LABEL[runner.categoria] ?? runner.categoria}
-        </span>
-      </div>
-
-      {/* Tiempo neto */}
-      <div className="hidden md:flex items-center gap-1.5">
-        <Clock size={12} className="text-gray-500 shrink-0" />
-        <span
-          className={`text-sm font-mono font-bold ${
-            runner.tiempo_neto ? "text-amber-300" : "text-gray-600"
-          }`}
-        >
-          {runner.tiempo_neto ?? "—"}
-        </span>
-      </div>
-
-      {/* Controles */}
-      <div className="hidden md:grid grid-cols-3 gap-1">
-        {CONTROL_KEYS.map((controlKey, index) => {
-          const value = runner[controlKey];
           return (
             <div
-              key={`${runner.id}-${controlKey}`}
-              className="rounded bg-gray-800/80 border border-gray-700/50 px-1.5 py-1"
+              className={`rounded-xl border transition-all duration-300 ${
+                isTop3
+                  ? "bg-amber-500/10 border-amber-500/30"
+                  : runner.estado === "EN_CARRERA"
+                    ? "bg-blue-500/5 border-blue-500/20"
+                    : "bg-gray-800/50 border-gray-700/30 hover:bg-gray-800/80"
+              }`}
             >
-              <div className="text-[10px] leading-none text-gray-500">
-                C{index + 1}
+              {/* ── Móvil ── */}
+              <div className="md:hidden flex items-center gap-2 px-3 py-3">
+                <div className="w-7 text-center flex-shrink-0 text-sm font-bold text-gray-300">{generalPosition}</div>
+                <span className="text-xs font-mono font-bold text-gray-300 bg-gray-700/60 px-1.5 py-0.5 rounded flex-shrink-0">
+                  {runner.dorsal}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-white text-sm leading-tight truncate">
+                    {runner.nombre} {runner.apellidos}
+                  </div>
+                  {runner.club && (
+                    <div className="text-xs text-gray-500 truncate">{runner.club}</div>
+                  )}
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${badge.className}`}>
+                    {badge.label}
+                  </span>
+                  {runner.tiempo_neto && (
+                    <div className="text-xs font-mono text-amber-300 mt-0.5">{runner.tiempo_neto}</div>
+                  )}
+                </div>
               </div>
-              <div
-                className={`text-[11px] leading-tight font-mono font-semibold ${value ? "text-amber-300" : "text-gray-600"}`}
-              >
-                {value ?? "--:--:--"}
+
+              {/* ── Desktop ── */}
+              <div className="hidden md:grid grid-cols-[56px_110px_60px_1fr_120px_130px_280px_100px] gap-3 items-center px-4 py-3.5">
+                <div className="flex justify-center"><PodiumIcon pos={generalPosition} /></div>
+                <div className="flex items-center gap-1"><CategoryPositionBadge pos={runner.puesto_categoria} /></div>
+                <div className="text-center">
+                  <span className="text-sm font-mono font-bold text-gray-300 bg-gray-700/60 px-2 py-0.5 rounded">{runner.dorsal}</span>
+                </div>
+                <div className="min-w-0">
+                  <div className="font-semibold text-white text-sm leading-tight truncate">{runner.nombre} {runner.apellidos}</div>
+                  {runner.club && <div className="text-xs text-gray-500 mt-0.5 truncate">{runner.club}</div>}
+                </div>
+                <div>
+                  <span className="text-xs text-gray-400 bg-gray-700/40 px-2 py-0.5 rounded font-medium">
+                    {CATEGORIA_LABEL[runner.categoria] ?? runner.categoria}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock size={12} className="text-gray-500 shrink-0" />
+                  <span className={`text-sm font-mono font-bold ${runner.tiempo_neto ? "text-amber-300" : "text-gray-600"}`}>
+                    {runner.tiempo_neto ?? "—"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-1">
+                  {CONTROL_KEYS.map((controlKey, index) => {
+                    const value = runner[controlKey];
+                    return (
+                      <div key={`${runner.id}-${controlKey}`} className="rounded bg-gray-800/80 border border-gray-700/50 px-1.5 py-1">
+                        <div className="text-[10px] leading-none text-gray-500">C{index + 1}</div>
+                        <div className={`text-[11px] leading-tight font-mono font-semibold ${value ? "text-amber-300" : "text-gray-600"}`}>
+                          {value ?? "--:--:--"}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${badge.className}`}>{badge.label}</span>
+                </div>
               </div>
             </div>
           );
-        })}
-      </div>
 
-      {/* Estado */}
-      <div>
-        <span
-          className={`text-xs px-2 py-0.5 rounded-full font-semibold ${badge.className}`}
-        >
-          {badge.label}
-        </span>
-        {/* Tiempo en móvil */}
-        <div className="md:hidden text-xs font-mono text-amber-300 mt-0.5 space-y-0.5">
-          {runner.tiempo_neto && <div>{runner.tiempo_neto}</div>}
-          <div className="text-gray-400">Controles:</div>
-          <div className="grid grid-cols-3 gap-1.5 text-[11px]">
-            {CONTROL_KEYS.map((controlKey, index) => {
-              const value = runner[controlKey];
-              return (
-                <span
-                  key={`m-${runner.id}-${controlKey}`}
-                  className={`rounded px-1.5 py-0.5 bg-gray-800/80 border border-gray-700/50 ${value ? "text-amber-300" : "text-gray-600"}`}
-                >
-                  C{index + 1} {value ?? "--:--:--"}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-/* deployed Tue May 19 14:13:49 CEST 2026 */
