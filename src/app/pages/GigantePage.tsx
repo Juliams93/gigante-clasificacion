@@ -59,10 +59,17 @@ function CategoryPositionBadge({ pos }: { pos: number | null }) {
 
 export default function GigantePage() {
   const hasBackendApi = Boolean(import.meta.env.VITE_RESULTS_API_URL);
+  const isProduction = 
+    typeof globalThis !== "undefined" &&
+    globalThis.window !== undefined &&
+    globalThis.window.location.hostname !== "localhost" &&
+    globalThis.window.location.hostname !== "127.0.0.1";
+
+  // In production without backend API, always use demo mode
+  // Otherwise, allow demo mode to be controlled via URL parameter
   const searchParams = new URLSearchParams(window.location.search);
-  const isDemoMode = hasBackendApi
-    ? searchParams.get("demo") === "1"
-    : searchParams.get("demo") !== "0";
+  const isDemoMode = (isProduction && !hasBackendApi) || searchParams.get("demo") === "1";
+  
   const [dorsal, setDorsal] = useState("");
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("TODAS");
@@ -97,7 +104,7 @@ export default function GigantePage() {
             <div>
               <div className="flex items-center gap-6 mb-4">
                 <img
-                  src="/imagenes/LOGO GIGANTE DE PIEDRA_negro+textoblanco.png"
+                  src="/imagenes/logo-gigante-negro.png"
                   alt="La Gigante de Piedra"
                   className="h-24 md:h-28 w-auto object-contain"
                 />
