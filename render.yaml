@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: gigante-results-api
+    runtime: node
+    rootDir: sync-script
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run api
+    healthCheckPath: /health
+    envVars:
+      - key: RESULTS_SOURCE
+        value: csv-url
+      - key: CSV_URL
+        sync: false
+      - key: API_KEY
+        sync: false

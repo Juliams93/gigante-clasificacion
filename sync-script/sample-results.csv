@@ -1,0 +1,6 @@
+dorsal,nombre,apellidos,categoria,club,localidad,meta,orden1,poscate1,estado,control1,control2,control3,control4,control5,control6,controles
+101,Carlos,Martinez,ABSOLUTA_M,MTB Valencia,Valencia,02:44:55,1,1,FINALIZADO,00:11:02,00:18:44,00:27:36,00:33:15,00:38:27,00:42:18,00:42:18
+143,Lucia,Gomez,ABSOLUTA_F,Bike Team Xativa,Xativa,02:50:58,2,1,FINALIZADO,00:11:24,00:19:22,00:28:10,00:34:11,00:40:06,00:44:07,00:44:07
+188,Pablo,Serrano,VETERANO_M,Pedal Storm,Castellon,02:55:50,3,1,FINALIZADO,00:11:31,00:20:05,00:29:14,00:35:42,00:41:08,00:45:32,00:45:32
+205,Nerea,Lopez,SUB23_F,Alto Turia Bike,Chelva,,,,EN_CARRERA,00:10:56,00:20:40,00:31:05,,,,00:31:05
+221,Hector,Ruiz,ABSOLUTA_M,Dual Riders,Sagunto,,,,EN_CARRERA,00:09:53,00:19:48,,,,,00:19:48
