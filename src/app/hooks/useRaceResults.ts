@@ -12,16 +12,29 @@ function isLocalBackendUrl(url: string): boolean {
 }
 
 function resolveResultsApiUrl(): string {
-  if (!CONFIGURED_RESULTS_API_URL) return "/api/runners";
+  if (!CONFIGURED_RESULTS_API_URL) {
+    // In production, default to ngrok URL for live backend data
+    const isProduction = 
+      typeof globalThis !== "undefined" &&
+      globalThis.window !== undefined &&
+      globalThis.window.location.hostname !== "localhost" &&
+      globalThis.window.location.hostname !== "127.0.0.1";
+    
+    if (isProduction) {
+      return "https://delegate-bagginess-massive.ngrok-free.dev/api/runners";
+    }
+    return "/api/runners";
+  }
 
-  // In production, ignore accidental localhost configuration and use Vercel API.
+  // In production, ignore accidental localhost configuration and use ngrok instead.
   if (
+    typeof globalThis !== "undefined" &&
     globalThis.window !== undefined &&
     globalThis.window.location.hostname !== "localhost" &&
     globalThis.window.location.hostname !== "127.0.0.1" &&
     isLocalBackendUrl(CONFIGURED_RESULTS_API_URL)
   ) {
-    return "/api/runners";
+    return "https://delegate-bagginess-massive.ngrok-free.dev/api/runners";
   }
 
   return CONFIGURED_RESULTS_API_URL;
