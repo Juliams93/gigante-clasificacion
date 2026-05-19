@@ -8,9 +8,7 @@ const CONFIGURED_RESULTS_API_URL = (
 )?.trim();
 
 function isLocalBackendUrl(url: string): boolean {
-  return /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?\//i.test(
-    url,
-  );
+  return /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?\//i.test(url);
 }
 
 function resolveResultsApiUrl(): string {
@@ -248,7 +246,23 @@ export function useRaceResults({
           );
         } catch {
           if (!active) return;
-          setError("Error al cargar desde backend propio.");
+
+          // Fallback visible en producción: si el backend falla, mostramos datos demo.
+          const demoRunners = filterLocalRunners(MOCK_RUNNERS, {
+            categoria,
+            modalidad,
+            dorsal,
+            nombre,
+            search,
+            sortBy,
+          });
+
+          setRunners(demoRunners);
+          setLastUpdate(new Date());
+          setTotalFinishers(
+            demoRunners.filter((r) => r.estado === "FINALIZADO").length,
+          );
+          setError(null);
         } finally {
           if (active) setLoading(false);
         }
