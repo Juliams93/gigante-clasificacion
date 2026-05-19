@@ -106,14 +106,14 @@ export default function GigantePage() {
             <div>
               <div className="flex items-center justify-center md:justify-start gap-2 md:gap-6 mb-3 md:mb-4 min-w-0">
                 <img
-                  src="/imagenes/LETRAS_LOGO GIGANTE_Grises.png"
-                  alt="Gigante letras grises"
-                  className="h-14 sm:h-18 md:h-32 w-auto object-contain object-center max-w-[58vw] md:max-w-none"
-                />
-                <img
                   src="/imagenes/logo-gigante-negro.png"
                   alt="La Gigante de Piedra"
                   className="h-12 sm:h-16 md:h-28 w-auto object-contain flex-shrink-0"
+                />
+                <img
+                  src="/imagenes/LETRAS_LOGO GIGANTE_Grises.png"
+                  alt="Gigante letras grises"
+                  className="h-14 sm:h-18 md:h-32 w-auto object-contain object-center max-w-[58vw] md:max-w-none"
                 />
               </div>
               <span className="text-amber-400 font-bold text-xs md:text-sm tracking-widest uppercase block">
