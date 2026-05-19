@@ -237,7 +237,7 @@ export function useRaceResults({
       };
     }
 
-    if (usingApi && RESULTS_API_URL) {
+    if (usingApi && apiUrl) {
       const fetchFromApi = async () => {
         setLoading(true);
         setError(null);
