@@ -111,7 +111,7 @@ export default function GigantePage() {
                   className="h-12 sm:h-16 md:h-28 w-auto object-contain flex-shrink-0"
                 />
                 <img
-                  src="/imagenes/LETRAS_LOGO GIGANTE_Grises.png"
+                  src="/imagenes/LETRAS_LOGO GIGANTE_Negro+Blanco.png"
                   alt="Gigante"
                   className="h-16 sm:h-20 md:h-40 w-auto object-contain object-center max-w-[92vw] md:max-w-none"
                 />
@@ -330,6 +330,10 @@ function RunnerRow({
           <span className="text-xs font-mono font-bold text-gray-300 bg-gray-700/60 px-1.5 py-0.5 rounded flex-shrink-0">
             {runner.dorsal}
           </span>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <span className="text-[10px] uppercase tracking-wide text-gray-500">Cat</span>
+            <CategoryPositionBadge pos={runner.puesto_categoria} />
+          </div>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-white text-sm leading-tight truncate">
               {runner.nombre} {runner.apellidos}
@@ -369,6 +373,10 @@ function RunnerRow({
                 <span className="text-gray-200">
                   {CATEGORIA_LABEL[runner.categoria] ?? runner.categoria}
                 </span>
+              </div>
+              <div className="text-gray-400">
+                Pos. categoria:{" "}
+                <span className="text-gray-200">{runner.puesto_categoria ?? "—"}</span>
               </div>
               <div className="text-gray-400">
                 Tiempo:{" "}
