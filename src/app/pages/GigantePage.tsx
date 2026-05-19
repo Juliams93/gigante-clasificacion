@@ -112,7 +112,7 @@ export default function GigantePage() {
                 <img
                   src="/imagenes/LETRAS_LOGO GIGANTE_Grises.png"
                   alt="Gigante"
-                  className="h-12 sm:h-14 md:h-40 w-auto object-contain object-left min-w-0 max-w-[calc(100vw-80px)] md:max-w-none"
+                  className="hidden md:block h-40 w-auto object-contain object-left"
                 />
               </div>
               <span className="text-amber-400 font-bold text-xs md:text-sm tracking-widest uppercase block">
@@ -311,33 +311,59 @@ function RunnerRow({
       }`}
     >
       {/* Movil */}
-      <div className="md:hidden flex items-center gap-2 px-3 py-3">
-        <div className="w-7 text-center flex-shrink-0 text-sm font-bold text-gray-300">
-          {generalPosition}
-        </div>
-        <span className="text-xs font-mono font-bold text-gray-300 bg-gray-700/60 px-1.5 py-0.5 rounded flex-shrink-0">
-          {runner.dorsal}
-        </span>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-white text-sm leading-tight truncate">
-            {runner.nombre} {runner.apellidos}
+      <div className="md:hidden px-3 py-3">
+        <div className="flex items-center gap-2">
+          <div className="w-7 text-center flex-shrink-0 text-sm font-bold text-gray-300">
+            {generalPosition}
           </div>
-          {runner.club && (
-            <div className="text-xs text-gray-500 truncate">{runner.club}</div>
-          )}
-        </div>
-        <div className="flex-shrink-0 text-right">
-          <span
-            className={`text-xs px-2 py-0.5 rounded-full font-semibold ${badge.className}`}
-          >
-            {badge.label}
+          <span className="text-xs font-mono font-bold text-gray-300 bg-gray-700/60 px-1.5 py-0.5 rounded flex-shrink-0">
+            {runner.dorsal}
           </span>
-          {runner.tiempo_neto && (
-            <div className="text-xs font-mono text-amber-300 mt-0.5">
-              {runner.tiempo_neto}
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-white text-sm leading-tight truncate">
+              {runner.nombre} {runner.apellidos}
             </div>
-          )}
+          </div>
+          <div className="flex-shrink-0 text-right">
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full font-semibold ${badge.className}`}
+            >
+              {badge.label}
+            </span>
+          </div>
         </div>
+
+        <details className="mt-2 rounded-lg border border-gray-700/60 bg-gray-900/40">
+          <summary className="cursor-pointer list-none px-2.5 py-2 text-xs text-amber-300 font-semibold">
+            Ver detalles del corredor
+          </summary>
+          <div className="border-t border-gray-700/60 px-2.5 py-2 space-y-2 text-xs">
+            {runner.club && (
+              <div className="text-gray-400">
+                Club: <span className="text-gray-200">{runner.club}</span>
+              </div>
+            )}
+            <div className="text-gray-400">
+              Categoria: <span className="text-gray-200">{CATEGORIA_LABEL[runner.categoria] ?? runner.categoria}</span>
+            </div>
+            <div className="text-gray-400">
+              Tiempo: <span className="font-mono text-amber-300">{runner.tiempo_neto ?? "--:--:--"}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+              {CONTROL_KEYS.map((controlKey, index) => {
+                const value = runner[controlKey];
+                return (
+                  <span
+                    key={`m-${runner.id}-${controlKey}`}
+                    className={`rounded px-1.5 py-0.5 bg-gray-800/80 border border-gray-700/50 ${value ? "text-amber-300" : "text-gray-600"}`}
+                  >
+                    C{index + 1}: {value ?? "--:--:--"}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </details>
       </div>
 
       {/* Desktop */}
