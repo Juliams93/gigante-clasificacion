@@ -12,7 +12,10 @@ import {
   Users,
 } from "lucide-react";
 import { useRaceResults } from "../hooks/useRaceResults";
-import { useSessionTracking, useActiveSessions } from "../hooks/useSessionTracking";
+import {
+  useSessionTracking,
+  useActiveSessions,
+} from "../hooks/useSessionTracking";
 import type { Runner } from "../../types/supabase";
 
 const CATEGORIA_LABEL: Record<string, string> = {

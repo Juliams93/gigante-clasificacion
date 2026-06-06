@@ -4,20 +4,35 @@ import { useEffect, useState } from "react";
  * Hook que registra sesiones activas en el backend
  * Se ejecuta al cargar la página y cada 2 minutos después
  */
-export function useSessionTracking(apiBaseUrl: string = "https://gigante-clasificacion.onrender.com") {
+export function useSessionTracking(
+  apiBaseUrl: string = "https://gigante-clasificacion.onrender.com",
+) {
   useEffect(() => {
-    let sessionId: string;
+    let sessionId: string | null = null;
 
     const trackSession = async () => {
       try {
+        const id = sessionId || `session-${Date.now()}-${Math.random()}`;
         const response = await fetch(
-          `${apiBaseUrl}/api/sessions?id=${encodeURIComponent(sessionId || `session-${Date.now()}-${Math.random()}`)}`,
-          { method: "GET" }
+          `${apiBaseUrl}/api/sessions?id=${encodeURIComponent(id)}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          },
         );
+        if (!response.ok) {
+          console.warn(
+            `Session tracking failed: ${response.status} ${response.statusText}`,
+          );
+          return;
+        }
         const data = await response.json();
         sessionId = data.sessionId;
+        console.debug(
+          `Session registered: ${sessionId}, active: ${data.activeCount}`,
+        );
       } catch (error) {
-        console.debug("Session tracking error (non-critical):", error);
+        console.warn("Session tracking error:", error);
       }
     };
 
@@ -34,17 +49,35 @@ export function useSessionTracking(apiBaseUrl: string = "https://gigante-clasifi
 /**
  * Hook que obtiene el conteo actual de sesiones activas
  */
-export function useActiveSessions(apiBaseUrl: string = "https://gigante-clasificacion.onrender.com") {
+export function useActiveSessions(
+  apiBaseUrl: string = "https://gigante-clasificacion.onrender.com",
+) {
   const [count, setCount] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/api/sessions-count`);
+        const response = await fetch(`${apiBaseUrl}/api/sessions-count`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) {
+          console.warn(`Failed to fetch session count: ${response.status}`);
+          setError(`Error ${response.status}`);
+          setCount(null);
+          return;
+        }
+
         const data = await response.json();
         setCount(data.active);
-      } catch (error) {
-        console.debug("Failed to fetch session count:", error);
+        setError(null);
+        console.debug(`Active sessions: ${data.active}`);
+      } catch (err) {
+        console.warn("Failed to fetch session count:", err);
+        setError("Conexión");
+        setCount(null);
       }
     };
 
@@ -54,5 +87,5 @@ export function useActiveSessions(apiBaseUrl: string = "https://gigante-clasific
     return () => clearInterval(interval);
   }, [apiBaseUrl]);
 
-  return count;
+  return error ? 0 : count;
 }

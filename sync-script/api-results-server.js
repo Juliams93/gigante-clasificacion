@@ -446,7 +446,8 @@ const server = http.createServer(async (req, res) => {
 
   if (url.pathname === "/api/sessions") {
     // Registra una nueva sesión (heartbeat)
-    const sessionId = url.searchParams.get("id") || `session-${Date.now()}-${Math.random()}`;
+    const sessionId =
+      url.searchParams.get("id") || `session-${Date.now()}-${Math.random()}`;
     activeSessions.set(sessionId, Date.now());
     return sendJson(res, 200, {
       sessionId,
