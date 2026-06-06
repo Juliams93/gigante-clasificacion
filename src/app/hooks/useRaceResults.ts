@@ -127,6 +127,41 @@ function sortRunners(runners: Runner[], sortBy: SortField): Runner[] {
   });
 }
 
+function isZeroRaceTime(value: string | null | undefined): boolean {
+  const time = String(value ?? "").trim();
+  if (time.length === 0) return true;
+  return (
+    time === "0" ||
+    time === "00:00" ||
+    time === "00:00:00" ||
+    /^0{1,2}:0{2}:0{2}(?:\.0+)?$/.test(time)
+  );
+}
+
+function normalizeRunnerEstado(runner: Runner): Runner {
+  if (runner.estado !== "FINALIZADO") return runner;
+
+  const metaOficial = runner.tiempo_oficial;
+  const metaNeta = runner.tiempo_neto;
+  const hasAnyCheckpoint =
+    !!runner.control1 ||
+    !!runner.control2 ||
+    !!runner.control3 ||
+    !!runner.control4 ||
+    !!runner.control5 ||
+    !!runner.control6;
+
+  if (isZeroRaceTime(metaOficial) && isZeroRaceTime(metaNeta) && hasAnyCheckpoint) {
+    return { ...runner, estado: "EN_CARRERA" };
+  }
+
+  return runner;
+}
+
+function normalizeRunnersEstado(runners: Runner[]): Runner[] {
+  return runners.map(normalizeRunnerEstado);
+}
+
 function filterLocalRunners(
   runners: Runner[],
   options: {
@@ -251,7 +286,8 @@ export function useRaceResults({
             search,
             sortBy,
           });
-          const apiRunners = await fetchRunnersFromApi(apiUrl, params);
+          const apiRunnersRaw = await fetchRunnersFromApi(apiUrl, params);
+          const apiRunners = normalizeRunnersEstado(apiRunnersRaw);
           if (!active) return;
 
           setRunners(apiRunners);
@@ -335,7 +371,7 @@ export function useRaceResults({
       if (err) {
         setError("Error al cargar la clasificación. Comprueba la conexión.");
       } else {
-        setRunners(data ?? []);
+        setRunners(normalizeRunnersEstado(data ?? []));
         setLastUpdate(new Date());
         setTotalFinishers(
           (data ?? []).filter((r) => r.estado === "FINALIZADO").length,
@@ -361,12 +397,13 @@ export function useRaceResults({
 
   // Handlers para tiempo real — definidos fuera del channel callback
   const handleInsert = useCallback(
-    (r: Runner) => setRunners((prev) => [...prev, r]),
+    (r: Runner) => setRunners((prev) => [...prev, normalizeRunnerEstado(r)]),
     [],
   );
   const handleUpdate = useCallback((r: Runner) => {
-    setRunners((prev) => replaceRunner(prev, r));
-    if (r.estado === "FINALIZADO") setTotalFinishers((prev) => prev + 1);
+    const normalized = normalizeRunnerEstado(r);
+    setRunners((prev) => replaceRunner(prev, normalized));
+    if (normalized.estado === "FINALIZADO") setTotalFinishers((prev) => prev + 1);
   }, []);
   const handleDelete = useCallback((id: number) => {
     setRunners((prev) => removeById(prev, id));
