@@ -162,8 +162,7 @@ function resolveEstado(row) {
   )
     return "RETIRADO";
   // Business rule: only mark FINALIZADO when finish time is non-zero.
-  if (hasMetaFinishTime)
-    return "FINALIZADO";
+  if (hasMetaFinishTime) return "FINALIZADO";
   if (
     rawEstado.includes("RUN") ||
     rawEstado === "EN_CARRERA" ||
