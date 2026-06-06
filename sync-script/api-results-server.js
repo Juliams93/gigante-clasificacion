@@ -161,16 +161,15 @@ function resolveEstado(row) {
     isTruthyFlag(retirado)
   )
     return "RETIRADO";
-  if (
-    rawEstado.includes("FINISH") ||
-    rawEstado === "F" ||
-    rawEstado === "FINALIZADO" ||
-    hasMetaFinishTime
-  )
+  // Business rule: only mark FINALIZADO when finish time is non-zero.
+  if (hasMetaFinishTime)
     return "FINALIZADO";
   if (
     rawEstado.includes("RUN") ||
     rawEstado === "EN_CARRERA" ||
+    rawEstado.includes("FINISH") ||
+    rawEstado === "F" ||
+    rawEstado === "FINALIZADO" ||
     hasValue(c1) ||
     hasValue(c2) ||
     hasValue(c3) ||
