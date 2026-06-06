@@ -1,8 +1,49 @@
 import { useEffect, useState } from "react";
 
+// Almacenamiento local de sesiones (fallback cuando backend no responde)
+const SESSION_STORAGE_KEY = "gigante_sessions";
+
+function getLocalActiveSessions(): number {
+  try {
+    const stored = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (!stored) return 1;
+    const sessions = JSON.parse(stored);
+    const now = Date.now();
+    // Limpia sesiones expiradas (5 minutos)
+    const active = Object.entries(sessions).filter(([, timestamp]: [string, any]) => 
+      now - timestamp < 5 * 60 * 1000
+    );
+    const updated = Object.fromEntries(active);
+    if (Object.keys(updated).length === 0) {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      return 1;
+    }
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updated));
+    return active.length;
+  } catch {
+    return 1;
+  }
+}
+
+function recordLocalSession(): void {
+  try {
+    const sessionId = `session-${Date.now()}-${Math.random()}`;
+    const sessions = (() => {
+      try {
+        return JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    })();
+    sessions[sessionId] = Date.now();
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessions));
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
 /**
- * Hook que registra sesiones activas en el backend
- * Se ejecuta al cargar la página y cada 2 minutos después
+ * Hook que registra sesiones activas en el backend (con fallback a localStorage)
  */
 export function useSessionTracking(
   apiBaseUrl: string = "https://gigante-clasificacion.onrender.com",
@@ -15,25 +56,24 @@ export function useSessionTracking(
         const id = sessionId || `session-${Date.now()}-${Math.random()}`;
         const response = await fetch(
           `${apiBaseUrl}/api/sessions?id=${encodeURIComponent(id)}`,
-          {
+          { 
             method: "GET",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json" }
           },
         );
-        if (!response.ok) {
-          console.warn(
-            `Session tracking failed: ${response.status} ${response.statusText}`,
-          );
+        if (response.ok) {
+          const data = await response.json();
+          sessionId = data.sessionId;
+          console.debug(`Session registered: ${sessionId}, active: ${data.activeCount}`);
           return;
         }
-        const data = await response.json();
-        sessionId = data.sessionId;
-        console.debug(
-          `Session registered: ${sessionId}, active: ${data.activeCount}`,
-        );
       } catch (error) {
-        console.warn("Session tracking error:", error);
+        // Fallback to localStorage
+        console.debug("Backend session tracking unavailable, using local fallback");
       }
+      
+      // Fallback: record locally
+      recordLocalSession();
     };
 
     // Registra sesión inicial
@@ -48,37 +88,35 @@ export function useSessionTracking(
 
 /**
  * Hook que obtiene el conteo actual de sesiones activas
+ * Primero intenta el backend, si falla usa localStorage
  */
 export function useActiveSessions(
   apiBaseUrl: string = "https://gigante-clasificacion.onrender.com",
 ) {
   const [count, setCount] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCount = async () => {
       try {
         const response = await fetch(`${apiBaseUrl}/api/sessions-count`, {
           method: "GET",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" }
         });
-
-        if (!response.ok) {
-          console.warn(`Failed to fetch session count: ${response.status}`);
-          setError(`Error ${response.status}`);
-          setCount(null);
+        
+        if (response.ok) {
+          const data = await response.json();
+          setCount(data.active);
+          console.debug(`Active sessions (backend): ${data.active}`);
           return;
         }
-
-        const data = await response.json();
-        setCount(data.active);
-        setError(null);
-        console.debug(`Active sessions: ${data.active}`);
       } catch (err) {
-        console.warn("Failed to fetch session count:", err);
-        setError("Conexión");
-        setCount(null);
+        console.debug("Backend sessions endpoint unavailable");
       }
+      
+      // Fallback: usar localStorage
+      const localCount = getLocalActiveSessions();
+      setCount(localCount);
+      console.debug(`Active sessions (local): ${localCount}`);
     };
 
     fetchCount();
@@ -87,5 +125,5 @@ export function useActiveSessions(
     return () => clearInterval(interval);
   }, [apiBaseUrl]);
 
-  return error ? 0 : count;
+  return count;
 }
