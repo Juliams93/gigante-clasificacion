@@ -9,8 +9,10 @@ import {
   WifiOff,
   Mountain,
   Filter,
+  Users,
 } from "lucide-react";
 import { useRaceResults } from "../hooks/useRaceResults";
+import { useSessionTracking, useActiveSessions } from "../hooks/useSessionTracking";
 import type { Runner } from "../../types/supabase";
 
 const CATEGORIA_LABEL: Record<string, string> = {
@@ -75,6 +77,10 @@ export default function GigantePage() {
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("TODAS");
   const [openRunnerId, setOpenRunnerId] = useState<number | null>(null);
+
+  // Tracking de sesiones activas
+  useSessionTracking();
+  const activeSessions = useActiveSessions();
 
   const { runners, loading, error, lastUpdate, totalFinishers, isLive } =
     useRaceResults({
@@ -207,7 +213,7 @@ export default function GigantePage() {
           </div>
 
           {/* Stats rápidos */}
-          <div className="grid grid-cols-3 gap-4 mt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
             <div className="bg-stone-800/60 rounded-xl p-4 border border-stone-700/40">
               <div className="text-2xl font-black text-amber-400">
                 {runners.length}
@@ -225,6 +231,13 @@ export default function GigantePage() {
                 {runners.filter((r) => r.estado === "EN_CARRERA").length}
               </div>
               <div className="text-xs text-gray-400 mt-0.5">En carrera</div>
+            </div>
+            <div className="bg-stone-800/60 rounded-xl p-4 border border-stone-700/40">
+              <div className="text-2xl font-black text-purple-400 flex items-center gap-1">
+                <Users size={20} />
+                {activeSessions ?? "—"}
+              </div>
+              <div className="text-xs text-gray-400 mt-0.5">Mirando ahora</div>
             </div>
           </div>
         </div>
@@ -331,7 +344,9 @@ function RunnerRow({
             {runner.dorsal}
           </span>
           <div className="flex items-center gap-1 flex-shrink-0">
-            <span className="text-[10px] uppercase tracking-wide text-gray-500">Cat</span>
+            <span className="text-[10px] uppercase tracking-wide text-gray-500">
+              Cat
+            </span>
             <CategoryPositionBadge pos={runner.puesto_categoria} />
           </div>
           <div className="flex-1 min-w-0">
@@ -376,7 +391,9 @@ function RunnerRow({
               </div>
               <div className="text-gray-400">
                 Pos. categoria:{" "}
-                <span className="text-gray-200">{runner.puesto_categoria ?? "—"}</span>
+                <span className="text-gray-200">
+                  {runner.puesto_categoria ?? "—"}
+                </span>
               </div>
               <div className="text-gray-400">
                 Tiempo:{" "}

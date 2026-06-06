@@ -404,6 +404,24 @@ function isAuthorized(req, url) {
   return headerKey === API_KEY || queryKey === API_KEY;
 }
 
+// Sistema de contador de sesiones activas
+const activeSessions = new Map();
+const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutos
+
+function cleanExpiredSessions() {
+  const now = Date.now();
+  for (const [sessionId, timestamp] of activeSessions.entries()) {
+    if (now - timestamp > SESSION_TIMEOUT) {
+      activeSessions.delete(sessionId);
+    }
+  }
+}
+
+function getActiveSessionsCount() {
+  cleanExpiredSessions();
+  return activeSessions.size;
+}
+
 const server = http.createServer(async (req, res) => {
   if (!req.url) return sendJson(res, 400, { error: "Bad request" });
 
@@ -422,6 +440,25 @@ const server = http.createServer(async (req, res) => {
     return sendJson(res, 200, {
       ok: true,
       source: RESULTS_SOURCE,
+      time: new Date().toISOString(),
+    });
+  }
+
+  if (url.pathname === "/api/sessions") {
+    // Registra una nueva sesión (heartbeat)
+    const sessionId = url.searchParams.get("id") || `session-${Date.now()}-${Math.random()}`;
+    activeSessions.set(sessionId, Date.now());
+    return sendJson(res, 200, {
+      sessionId,
+      activeCount: getActiveSessionsCount(),
+      time: new Date().toISOString(),
+    });
+  }
+
+  if (url.pathname === "/api/sessions-count") {
+    // Retorna el conteo de sesiones activas
+    return sendJson(res, 200, {
+      active: getActiveSessionsCount(),
       time: new Date().toISOString(),
     });
   }

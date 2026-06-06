@@ -151,7 +151,11 @@ function normalizeRunnerEstado(runner: Runner): Runner {
     !!runner.control5 ||
     !!runner.control6;
 
-  if (isZeroRaceTime(metaOficial) && isZeroRaceTime(metaNeta) && hasAnyCheckpoint) {
+  if (
+    isZeroRaceTime(metaOficial) &&
+    isZeroRaceTime(metaNeta) &&
+    hasAnyCheckpoint
+  ) {
     return { ...runner, estado: "EN_CARRERA" };
   }
 
@@ -403,7 +407,8 @@ export function useRaceResults({
   const handleUpdate = useCallback((r: Runner) => {
     const normalized = normalizeRunnerEstado(r);
     setRunners((prev) => replaceRunner(prev, normalized));
-    if (normalized.estado === "FINALIZADO") setTotalFinishers((prev) => prev + 1);
+    if (normalized.estado === "FINALIZADO")
+      setTotalFinishers((prev) => prev + 1);
   }, []);
   const handleDelete = useCallback((id: number) => {
     setRunners((prev) => removeById(prev, id));
