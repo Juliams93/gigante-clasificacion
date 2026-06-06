@@ -28,6 +28,14 @@ function hasValue(value) {
   return value !== null && value !== undefined && String(value).trim() !== "";
 }
 
+function isMeaningfulRaceTime(value) {
+  if (!hasValue(value)) return false;
+  const time = String(value).trim();
+  if (time === "0" || time === "00:00" || time === "00:00:00") return false;
+  if (/^0{1,2}:0{2}:0{2}(?:\.0+)?$/.test(time)) return false;
+  return true;
+}
+
 function asUpper(value) {
   return String(value ?? "")
     .trim()
@@ -138,6 +146,7 @@ function resolveEstado(row) {
   const rawEstado = asUpper(row.estado ?? row.STATUS ?? row.status);
   const retirado = getRetiradoValue(row);
   const meta = row.meta ?? row.tiempo_oficial ?? row.tiempo_neto;
+  const hasMetaFinishTime = isMeaningfulRaceTime(meta);
   const c1 = row.control1;
   const c2 = row.control2;
   const c3 = row.control3;
@@ -156,7 +165,7 @@ function resolveEstado(row) {
     rawEstado.includes("FINISH") ||
     rawEstado === "F" ||
     rawEstado === "FINALIZADO" ||
-    hasValue(meta)
+    hasMetaFinishTime
   )
     return "FINALIZADO";
   if (
